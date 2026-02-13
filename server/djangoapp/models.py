@@ -11,7 +11,7 @@ class CarMake(models.Model):
     description = models.TextField()
     # You can add other fields here as needed
     created_at = models.DateTimeField(default=now)
-    
+
     def __str__(self):
         return self.name
 
@@ -26,7 +26,7 @@ class CarModel(models.Model):
     HATCHBACK = 'Hatchback'
     CONVERTIBLE = 'Convertible'
     TRUCK = 'Truck'
-    
+
     CAR_TYPE_CHOICES = [
         (SEDAN, 'Sedan'),
         (SUV, 'SUV'),
@@ -36,7 +36,7 @@ class CarModel(models.Model):
         (CONVERTIBLE, 'Convertible'),
         (TRUCK, 'Truck'),
     ]
-    
+
     # Many-to-One relationship to CarMake
     car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
     dealer_id = models.IntegerField()
@@ -54,6 +54,6 @@ class CarModel(models.Model):
     )
     # You can add other fields here as needed
     created_at = models.DateTimeField(default=now)
-    
+
     def __str__(self):
         return f"{self.car_make.name} {self.name} ({self.year})"
