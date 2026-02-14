@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const port = 3030;
 
@@ -14,6 +15,12 @@ const dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'))
 
 mongoose.connect("mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
 
+const reviewLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs for review insertion
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const Reviews = require('./review');
 
@@ -88,7 +95,7 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 //Express route to insert review
-app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
+app.post('/insert_review', reviewLimiter, express.raw({ type: '*/*' }), async (req, res) => {
   const data = JSON.parse(req.body);
   const documents = await Reviews.find().sort( { id: -1 } );
   let new_id = documents[0].id+1;
