@@ -42,6 +42,13 @@ const fetchReviewsByDealerLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const fetchAllReviewsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // limit each IP to 200 requests per windowMs for fetching all reviews
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const Reviews = require('./review');
 
 const Dealerships = require('./dealership');
@@ -65,7 +72,7 @@ app.get('/', async (req, res) => {
 });
 
 // Express route to fetch all reviews
-app.get('/fetchReviews', async (req, res) => {
+app.get('/fetchReviews', fetchAllReviewsLimiter, async (req, res) => {
   try {
     const documents = await Reviews.find();
     res.json(documents);
